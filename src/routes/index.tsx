@@ -26,16 +26,15 @@ function Index() {
       />
 
       <nav className="absolute top-0 left-0 right-0 z-20 px-6 md:px-10 pt-6 flex items-center justify-between gap-4">
-        <div className="flex items-center gap-2 bg-neutral-900/90 backdrop-blur rounded-full pl-4 pr-6 py-3">
+        <div className="flex items-center gap-2 bg-white/10 backdrop-blur rounded-full pl-4 pr-6 py-3">
           <Logo />
-          <span className="text-white text-sm font-normal tracking-tight">securify</span>
+          <span className="text-white text-sm font-normal tracking-tight">stadie-park</span>
         </div>
 
-        <div className="hidden md:flex items-center gap-1 bg-neutral-900/90 backdrop-blur rounded-full px-3 py-2">
-          <a href="#platform" className="text-neutral-300 hover:text-white transition-colors text-sm px-5 py-2 rounded-full">platform</a>
-          <a href="#solutions" className="text-neutral-300 hover:text-white transition-colors text-sm px-5 py-2 rounded-full">solutions</a>
-          <a href="#company" className="text-neutral-300 hover:text-white transition-colors text-sm px-5 py-2 rounded-full">company</a>
-          <a href="#support" className="text-neutral-300 hover:text-white transition-colors text-sm px-5 py-2 rounded-full">support</a>
+        <div className="hidden md:flex items-center gap-1 bg-white/10 backdrop-blur rounded-full px-3 py-2">
+          <Link to="/login" className="text-neutral-200 hover:text-white transition-colors text-sm px-5 py-2 rounded-full">log in</Link>
+          <Link to="/ai-support" className="text-neutral-200 hover:text-white transition-colors text-sm px-5 py-2 rounded-full">ai support</Link>
+          <a href="#about" className="text-neutral-200 hover:text-white transition-colors text-sm px-5 py-2 rounded-full">about</a>
         </div>
 
         <Link
@@ -47,9 +46,9 @@ function Index() {
       </nav>
 
       <div className="relative h-full w-full">
-        <h1 className="hero-title absolute text-white font-medium text-[14vw] md:text-[13vw] left-4 md:left-10 top-[18%]">protect</h1>
-        <h1 className="hero-title absolute text-white font-medium text-[14vw] md:text-[13vw] right-4 md:right-10 top-[38%]">your</h1>
-        <h1 className="hero-title absolute text-white font-medium text-[14vw] md:text-[13vw] left-[18%] md:left-[28%] top-[58%]">data</h1>
+        <h1 className="hero-title absolute text-white font-medium text-[14vw] md:text-[13vw] left-4 md:left-10 top-[18%]">park</h1>
+        <h1 className="hero-title absolute text-white font-medium text-[14vw] md:text-[13vw] right-4 md:right-10 top-[38%]">with</h1>
+        <h1 className="hero-title absolute text-white font-medium text-[14vw] md:text-[13vw] left-[18%] md:left-[28%] top-[58%]">ease</h1>
 
         <p className="absolute left-6 md:left-10 top-[46%] max-w-[240px] text-[15px] leading-snug text-white/90">
           we can guarding your data with utmost care, empowering you with privacy everywhere
