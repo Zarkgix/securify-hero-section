@@ -1,10 +1,17 @@
 export function Logo({ className = "h-5 w-5" }: { className?: string }) {
   return (
-    <svg viewBox="0 0 256 256" className={className} xmlns="http://www.w3.org/2000/svg">
-      <path
-        fill="#ffffff"
-        d="M 128 192 L 128 256 L 64.5 256 L 32 223 L 0 192 L 0 128 L 64 128 Z M 256 192 L 256 256 L 192.5 256 L 160 223 L 128 192 L 128 128 L 192 128 Z M 128 64 L 128 128 L 64.5 128 L 32 95 L 0 64 L 0 0 L 64 0 Z M 256 64 L 256 128 L 192.5 128 L 160 95 L 128 64 L 128 0 L 192 0 Z"
-      />
+    <svg viewBox="0 0 64 64" className={className} xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#ffffff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+      {/* outer stadium bowl */}
+      <ellipse cx="32" cy="34" rx="26" ry="14" />
+      {/* inner field */}
+      <ellipse cx="32" cy="34" rx="14" ry="7" />
+      {/* center line */}
+      <line x1="32" y1="27" x2="32" y2="41" />
+      {/* floodlights */}
+      <line x1="10" y1="20" x2="10" y2="12" />
+      <line x1="54" y1="20" x2="54" y2="12" />
+      <circle cx="10" cy="10" r="2" fill="#ffffff" stroke="none" />
+      <circle cx="54" cy="10" r="2" fill="#ffffff" stroke="none" />
     </svg>
   );
 }
