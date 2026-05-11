@@ -9,8 +9,56 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ReportsRouteImport } from './routes/reports'
+import { Route as RegisterRouteImport } from './routes/register'
+import { Route as QueueRouteImport } from './routes/queue'
+import { Route as PaymentRouteImport } from './routes/payment'
+import { Route as ParkingRouteImport } from './routes/parking'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as AiSupportRouteImport } from './routes/ai-support'
 import { Route as IndexRouteImport } from './routes/index'
 
+const ReportsRoute = ReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QueueRoute = QueueRouteImport.update({
+  id: '/queue',
+  path: '/queue',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PaymentRoute = PaymentRouteImport.update({
+  id: '/payment',
+  path: '/payment',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ParkingRoute = ParkingRouteImport.update({
+  id: '/parking',
+  path: '/parking',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AiSupportRoute = AiSupportRouteImport.update({
+  id: '/ai-support',
+  path: '/ai-support',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -19,28 +67,144 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/ai-support': typeof AiSupportRoute
+  '/dashboard': typeof DashboardRoute
+  '/login': typeof LoginRoute
+  '/parking': typeof ParkingRoute
+  '/payment': typeof PaymentRoute
+  '/queue': typeof QueueRoute
+  '/register': typeof RegisterRoute
+  '/reports': typeof ReportsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/ai-support': typeof AiSupportRoute
+  '/dashboard': typeof DashboardRoute
+  '/login': typeof LoginRoute
+  '/parking': typeof ParkingRoute
+  '/payment': typeof PaymentRoute
+  '/queue': typeof QueueRoute
+  '/register': typeof RegisterRoute
+  '/reports': typeof ReportsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/ai-support': typeof AiSupportRoute
+  '/dashboard': typeof DashboardRoute
+  '/login': typeof LoginRoute
+  '/parking': typeof ParkingRoute
+  '/payment': typeof PaymentRoute
+  '/queue': typeof QueueRoute
+  '/register': typeof RegisterRoute
+  '/reports': typeof ReportsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/ai-support'
+    | '/dashboard'
+    | '/login'
+    | '/parking'
+    | '/payment'
+    | '/queue'
+    | '/register'
+    | '/reports'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/ai-support'
+    | '/dashboard'
+    | '/login'
+    | '/parking'
+    | '/payment'
+    | '/queue'
+    | '/register'
+    | '/reports'
+  id:
+    | '__root__'
+    | '/'
+    | '/ai-support'
+    | '/dashboard'
+    | '/login'
+    | '/parking'
+    | '/payment'
+    | '/queue'
+    | '/register'
+    | '/reports'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AiSupportRoute: typeof AiSupportRoute
+  DashboardRoute: typeof DashboardRoute
+  LoginRoute: typeof LoginRoute
+  ParkingRoute: typeof ParkingRoute
+  PaymentRoute: typeof PaymentRoute
+  QueueRoute: typeof QueueRoute
+  RegisterRoute: typeof RegisterRoute
+  ReportsRoute: typeof ReportsRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/reports': {
+      id: '/reports'
+      path: '/reports'
+      fullPath: '/reports'
+      preLoaderRoute: typeof ReportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/queue': {
+      id: '/queue'
+      path: '/queue'
+      fullPath: '/queue'
+      preLoaderRoute: typeof QueueRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payment': {
+      id: '/payment'
+      path: '/payment'
+      fullPath: '/payment'
+      preLoaderRoute: typeof PaymentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/parking': {
+      id: '/parking'
+      path: '/parking'
+      fullPath: '/parking'
+      preLoaderRoute: typeof ParkingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ai-support': {
+      id: '/ai-support'
+      path: '/ai-support'
+      fullPath: '/ai-support'
+      preLoaderRoute: typeof AiSupportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -53,6 +217,14 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AiSupportRoute: AiSupportRoute,
+  DashboardRoute: DashboardRoute,
+  LoginRoute: LoginRoute,
+  ParkingRoute: ParkingRoute,
+  PaymentRoute: PaymentRoute,
+  QueueRoute: QueueRoute,
+  RegisterRoute: RegisterRoute,
+  ReportsRoute: ReportsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
