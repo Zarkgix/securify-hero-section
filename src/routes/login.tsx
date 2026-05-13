@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Logo } from "@/components/brand/Logo";
+import { AppNavbar } from "@/components/layout/AppNavbar";
 
 export const Route = createFileRoute("/login")({
   head: () => ({ meta: [{ title: "sign in — stadie-park" }] }),
