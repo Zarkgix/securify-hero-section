@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageShell } from "@/components/layout/PageShell";
 
 export const Route = createFileRoute("/register")({
-  head: () => ({ meta: [{ title: "register vehicle — securify" }] }),
+  head: () => ({ meta: [{ title: "register vehicle — stadie-park" }] }),
   component: RegisterPage,
 });
 
