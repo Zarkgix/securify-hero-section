@@ -9,7 +9,8 @@ export const Route = createFileRoute("/login")({
 
 function LoginPage() {
   return (
-    <div className="min-h-screen w-full bg-black flex items-center justify-center px-6">
+    <div className="relative min-h-screen w-full bg-black flex items-center justify-center px-6 pt-32 pb-12">
+      <AppNavbar cta="home" ctaTo="/" />
       <div className="w-full max-w-md bg-neutral-900/90 backdrop-blur rounded-3xl p-8 border border-white/10">
         <Link to="/" className="flex items-center gap-2 mb-8">
           <Logo />
