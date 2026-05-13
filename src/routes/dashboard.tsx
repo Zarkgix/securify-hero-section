@@ -3,7 +3,7 @@ import { PageShell } from "@/components/layout/PageShell";
 import { StatBlock } from "@/components/ui-ext/StatBlock";
 
 export const Route = createFileRoute("/dashboard")({
-  head: () => ({ meta: [{ title: "dashboard — securify" }] }),
+  head: () => ({ meta: [{ title: "dashboard — stadie-park" }] }),
   component: DashboardPage,
 });
 

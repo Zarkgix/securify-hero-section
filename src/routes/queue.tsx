@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PageShell } from "@/components/layout/PageShell";
 
 export const Route = createFileRoute("/queue")({
-  head: () => ({ meta: [{ title: "priority queue — securify" }] }),
+  head: () => ({ meta: [{ title: "priority queue — stadie-park" }] }),
   component: QueuePage,
 });
 

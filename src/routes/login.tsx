@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Logo } from "@/components/brand/Logo";
 
 export const Route = createFileRoute("/login")({
-  head: () => ({ meta: [{ title: "sign in — securify" }] }),
+  head: () => ({ meta: [{ title: "sign in — stadie-park" }] }),
   component: LoginPage,
 });
 
@@ -12,7 +12,7 @@ function LoginPage() {
       <div className="w-full max-w-md bg-neutral-900/90 backdrop-blur rounded-3xl p-8 border border-white/10">
         <Link to="/" className="flex items-center gap-2 mb-8">
           <Logo />
-          <span className="text-white text-sm tracking-tight">securify</span>
+          <span className="text-white text-sm tracking-tight">stadie-park</span>
         </Link>
 
         <h1 className="hero-title text-white font-medium text-4xl mb-2 lowercase">welcome back</h1>

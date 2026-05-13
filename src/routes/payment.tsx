@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PageShell } from "@/components/layout/PageShell";
 
 export const Route = createFileRoute("/payment")({
-  head: () => ({ meta: [{ title: "contactless payment — securify" }] }),
+  head: () => ({ meta: [{ title: "contactless payment — stadie-park" }] }),
   component: PaymentPage,
 });
 

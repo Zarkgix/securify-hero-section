@@ -3,7 +3,7 @@ import { useState } from "react";
 import { PageShell } from "@/components/layout/PageShell";
 
 export const Route = createFileRoute("/ai-support")({
-  head: () => ({ meta: [{ title: "ai support — securify" }] }),
+  head: () => ({ meta: [{ title: "ai support — stadie-park" }] }),
   component: AiSupportPage,
 });
 
@@ -11,7 +11,7 @@ type Msg = { role: "user" | "assistant"; text: string };
 
 function AiSupportPage() {
   const [messages, setMessages] = useState<Msg[]>([
-    { role: "assistant", text: "hi, i'm your local securify assistant. ask me about queue priorities, payments, or parking." },
+    { role: "assistant", text: "hi, i'm your local stadie-park assistant. ask me about queue priorities, payments, or parking." },
   ]);
   const [input, setInput] = useState("");
 
