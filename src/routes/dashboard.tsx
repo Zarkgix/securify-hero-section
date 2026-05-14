@@ -51,6 +51,7 @@ type TabKey =
   | "communications"
   | "limited-users"
   | "users"
+  | "vehicles"
   | "zones"
   | "priority"
   | "reports"
