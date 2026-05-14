@@ -456,47 +456,92 @@ function ProfileHeader({ user, onLogout }: { user: User; onLogout: () => void })
   );
 }
 
+const generalDrivers = [
+  { plate: "KDA 482J", driver: "John Mwangi", context: "Stadium ticket holder, Sec. 12" },
+  { plate: "KCB 119T", driver: "Faith Otieno", context: "Family of four, North gate" },
+  { plate: "KBN 776P", driver: "Brian Kiptoo", context: "Walk-in, Sec. 7" },
+];
+const vvipDrivers = [
+  { plate: "GK 042A", driver: "Hon. A. Karanja", context: "Cabinet Secretary convoy" },
+  { plate: "CD 18K", driver: "Amb. M. Lopez", context: "Diplomatic plate, Embassy of Spain" },
+  { plate: "KAA 001A", driver: "Club Chairman", context: "Executive box guest" },
+];
+const ambulanceContexts = [
+  { plate: "KDH 911E", driver: "Medic crew #4", context: "Aga Khan Hospital — chest pain in Sec. 9" },
+  { plate: "KCM 555A", driver: "St John Ambulance", context: "Patient transfer — cardiac priority" },
+];
+
+function nowStamp() {
+  const d = new Date();
+  return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}:${String(d.getSeconds()).padStart(2, "0")}`;
+}
+
 function DemoModePanel() {
   const [demoVehicles, setDemoVehicles] = useState<DemoVehicle[]>([]);
   const [demoZones, setDemoZones] = useState<DemoZone[]>(initialDemoZones);
   const [demoAlert, setDemoAlert] = useState("");
   const [activeStep, setActiveStep] = useState(1);
   const [reportReady, setReportReady] = useState(false);
-  const [log, setLog] = useState<string[]>(["Step 1: Monitoring dashboard opened. All demo zones are empty."]);
+  const [flashZone, setFlashZone] = useState<string>("");
+  const [autoRunning, setAutoRunning] = useState(false);
+  const [log, setLog] = useState<string[]>([
+    `${nowStamp()} — Demo session opened. Operator: Operations Manager. All zones empty.`,
+  ]);
 
   function addLog(text: string) {
-    setLog((current) => [text, ...current].slice(0, 8));
+    setLog((current) => [`${nowStamp()} — ${text}`, ...current].slice(0, 10));
+  }
+
+  function flash(zoneId: string) {
+    setFlashZone(zoneId);
+    window.setTimeout(() => setFlashZone(""), 900);
   }
 
   function sortQueue(vehicles: DemoVehicle[]) {
     return [...vehicles].sort((a, b) => b.score - a.score || a.id - b.id);
   }
 
+  function pick<T>(arr: T[], i: number): T {
+    return arr[i % arr.length];
+  }
+
   function registerGeneral() {
+    const seed = pick(generalDrivers, demoVehicles.filter((v) => v.category === "General").length);
     const vehicle: DemoVehicle = {
       id: Date.now(),
-      plate: `GEN-${demoVehicles.length + 1}`,
+      plate: seed.plate,
       category: "General",
       score: 1,
       zone: "General zone",
-      status: "queued at back",
+      status: "queued — back of line",
       wait: 0,
+      driver: seed.driver,
+      context: seed.context,
+      arrived: nowStamp(),
     };
     setDemoVehicles((current) => sortQueue([...current, vehicle]));
+    setDemoZones((current) =>
+      current.map((z) => (z.kind === "general" ? { ...z, occupied: Math.min(z.capacity, z.occupied + 1) } : z)),
+    );
+    flash("G");
     setActiveStep(2);
-    addLog("Step 2: General vehicle registered. Score = 1. It joins the back of the queue.");
+    addLog(`General vehicle ${seed.plate} (${seed.driver}) registered. Score = 1.0. Joins back of queue.`);
   }
 
   function registerVvip() {
     const vvipFull = demoZones.find((zone) => zone.kind === "vvip" && zone.occupied / zone.capacity >= 0.86);
+    const seed = pick(vvipDrivers, demoVehicles.filter((v) => v.category === "VVIP").length);
     const vehicle: DemoVehicle = {
       id: Date.now(),
-      plate: `VVIP-${demoVehicles.length + 1}`,
+      plate: seed.plate,
       category: "VVIP",
       score: vvipFull ? 7 : 8,
       zone: vvipFull ? "Overflow zone" : "VVIP zone",
-      status: vvipFull ? "redirected from VVIP, zone adjustment -1" : "assigned VVIP zone",
+      status: vvipFull ? "redirected — VVIP zone at capacity, score −1" : "assigned VVIP zone",
       wait: 0,
+      driver: seed.driver,
+      context: seed.context,
+      arrived: nowStamp(),
     };
     setDemoVehicles((current) => sortQueue([...current, vehicle]));
     setDemoZones((current) =>
@@ -506,70 +551,93 @@ function DemoModePanel() {
         return zone;
       }),
     );
+    flash(vvipFull ? "O" : "V");
     setActiveStep(vvipFull ? 5 : 3);
-    addLog(vvipFull ? "Step 5: VVIP redirected to overflow. Score adjusts by -1." : "Step 3: VVIP registered. Score = 8. It jumps above General.");
+    addLog(
+      vvipFull
+        ? `VVIP ${seed.plate} (${seed.driver}) redirected to Overflow. APS adjustment −1 → score 7.0.`
+        : `VVIP ${seed.plate} (${seed.driver}) registered. Score = 8.0. Jumps above General in queue.`,
+    );
   }
 
   function registerAmbulance() {
+    const seed = pick(ambulanceContexts, demoVehicles.filter((v) => v.category === "Emergency").length);
     const vehicle: DemoVehicle = {
       id: Date.now(),
-      plate: `AMB-${demoVehicles.length + 1}`,
+      plate: seed.plate,
       category: "Emergency",
       score: 20,
       zone: "Emergency zone",
-      status: "emergency alert fired",
+      status: "EMERGENCY — slot reserving…",
       wait: 0,
+      driver: seed.driver,
+      context: seed.context,
+      arrived: nowStamp(),
     };
-    setDemoAlert("Emergency vehicle detected. Priority override active.");
+    setDemoAlert(`🚨 EMERGENCY PREEMPTION — ${seed.plate} (${seed.context}). All non-essential traffic held.`);
     setDemoVehicles((current) => sortQueue([...current, vehicle]));
     setActiveStep(4);
-    addLog("Step 4: Emergency registered. Score = 20. Alert fired and slot assignment started.");
+    addLog(`Emergency ${seed.plate} detected — ${seed.context}. Score = 20.0. Preemption broadcast to all gates.`);
     window.setTimeout(() => {
       setDemoZones((current) =>
-        current.map((zone) => zone.kind === "emergency" ? { ...zone, occupied: Math.min(zone.capacity, zone.occupied + 1) } : zone),
+        current.map((zone) =>
+          zone.kind === "emergency" ? { ...zone, occupied: Math.min(zone.capacity, zone.occupied + 1) } : zone,
+        ),
       );
       setDemoVehicles((current) =>
-        current.map((item) => item.id === vehicle.id ? { ...item, status: "assigned in under 2 seconds" } : item),
+        current.map((item) => (item.id === vehicle.id ? { ...item, status: "assigned slot E-03 in 1.4 s" } : item)),
       );
-      addLog("Emergency slot assigned in under 2 seconds. Zone update completed.");
-    }, 1200);
+      flash("E");
+      addLog(`Slot E-03 assigned to ${seed.plate} in 1.4 s. ETA to bay: 38 s.`);
+    }, 1400);
   }
 
   function fillVvipZone() {
     setDemoZones((current) =>
-      current.map((zone) => zone.kind === "vvip" ? { ...zone, occupied: Math.ceil(zone.capacity * 0.86) } : zone),
+      current.map((zone) => (zone.kind === "vvip" ? { ...zone, occupied: Math.ceil(zone.capacity * 0.9) } : zone)),
     );
+    flash("V");
     setActiveStep(5);
-    addLog("Step 5: VVIP zone filled to 86%. Next VVIP will redirect to overflow.");
+    addLog("VVIP zone manually filled to 90%. APS will now redirect new VVIPs to Overflow with score −1.");
   }
 
   function waitTwentyMinutes() {
     setDemoVehicles((current) => {
       const existingGeneral = current.find((vehicle) => vehicle.category === "General");
       if (!existingGeneral) {
+        const seed = pick(generalDrivers, 0);
         return sortQueue([
           ...current,
           {
             id: Date.now(),
-            plate: "GEN-AGED",
+            plate: seed.plate,
             category: "General",
             score: 3,
             zone: "General zone",
-            status: "aged 20 minutes",
+            status: "aged 20 min — score promoted",
             wait: 20,
+            driver: seed.driver,
+            context: seed.context,
+            arrived: nowStamp(),
           },
         ]);
       }
-      return sortQueue(current.map((vehicle) => vehicle.id === existingGeneral.id ? { ...vehicle, score: 3, wait: 20, status: "aged 20 minutes" } : vehicle));
+      return sortQueue(
+        current.map((vehicle) =>
+          vehicle.id === existingGeneral.id
+            ? { ...vehicle, score: 3, wait: 20, status: "aged 20 min — score promoted from 1.0 → 3.0" }
+            : vehicle,
+        ),
+      );
     });
     setActiveStep(6);
-    addLog("Step 6: General vehicle fast-forwarded 20 minutes. Ageing raises score to 3.0.");
+    addLog("Ageing trigger fired. General vehicle waited 20 min → score raised 1.0 → 3.0 (fairness rule).");
   }
 
   function generateReport() {
     setReportReady(true);
     setActiveStep(7);
-    addLog("Step 7: Post-event report generated.");
+    addLog("Post-event report generated. Audit trail exported to reports/2026-05-14.csv.");
   }
 
   function resetDemo() {
@@ -578,90 +646,183 @@ function DemoModePanel() {
     setDemoAlert("");
     setActiveStep(1);
     setReportReady(false);
-    setLog(["Step 1: Monitoring dashboard opened. All demo zones are empty."]);
+    setFlashZone("");
+    setLog([`${nowStamp()} — Demo session reset. All zones empty.`]);
+  }
+
+  async function autoRun() {
+    if (autoRunning) return;
+    setAutoRunning(true);
+    resetDemo();
+    const wait = (ms: number) => new Promise((r) => window.setTimeout(r, ms));
+    await wait(400); registerGeneral();
+    await wait(1400); registerVvip();
+    await wait(1400); registerAmbulance();
+    await wait(2200); fillVvipZone();
+    await wait(1400); registerVvip();
+    await wait(1600); waitTwentyMinutes();
+    await wait(1600); generateReport();
+    setAutoRunning(false);
   }
 
   const steps = [
-    "Open monitoring dashboard. All zones empty. Logged in as Operations Manager.",
-    "Register General vehicle. Score = 1. It joins the queue.",
-    "Register VVIP vehicle. Score = 8. Queue reorders live.",
-    "Register Emergency vehicle. Score = 20. Alert fires and slot assigns.",
-    "Fill VVIP zone to 86%. Another VVIP redirects to overflow with -1 score adjustment.",
-    "Fast-forward General vehicle by 20 minutes. Score climbs to 3.0.",
-    "Generate post-event report with accuracy, utilisation, and waiting time.",
+    "Operator opens monitoring dashboard. All zones empty.",
+    "Register General vehicle. Score = 1.0. Joins back of queue.",
+    "Register VVIP vehicle. Score = 8.0. Queue reorders live.",
+    "Register Emergency vehicle. Score = 20.0. Alert fires; slot assigns < 2 s.",
+    "Fill VVIP zone to 90%. Next VVIP redirects to Overflow, score −1.",
+    "Fast-forward General vehicle by 20 min. Ageing promotes score 1.0 → 3.0.",
+    "Generate post-event report: accuracy, utilisation, average wait by category.",
   ];
 
   return (
-    <section className="mb-8 rounded-2xl border border-cyan-300/20 bg-cyan-300/5 p-5">
+    <section className="mb-8 rounded-2xl border border-cyan-300/20 bg-gradient-to-br from-cyan-300/5 to-transparent p-5">
       {demoAlert ? (
-        <div className="mb-4 rounded-xl border border-red-400/40 bg-red-500/20 px-4 py-3 text-sm text-red-100">
-          {demoAlert}
+        <div className="mb-4 flex items-start gap-3 rounded-xl border border-red-400/40 bg-red-500/20 px-4 py-3 text-sm text-red-100">
+          <span className="relative mt-1 flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-red-400" />
+          </span>
+          <div className="flex-1">{demoAlert}</div>
+          <button onClick={() => setDemoAlert("")} className="text-red-100/70 hover:text-white">×</button>
         </div>
       ) : null}
 
       <div className="mb-5 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h2 className="text-lg font-medium text-white">Demo Mode control panel</h2>
-          <p className="text-sm text-white/60">Operations Manager simulator for priority scoring, alerts, redirects, ageing, and reports.</p>
+          <div className="mb-1 inline-flex items-center gap-2 rounded-full bg-cyan-400/15 px-3 py-1 text-[11px] uppercase tracking-wider text-cyan-200">
+            <span className="h-1.5 w-1.5 rounded-full bg-cyan-300" />
+            Demo Mode • Live simulation
+          </div>
+          <h2 className="text-lg font-medium text-white">Operations control panel</h2>
+          <p className="text-sm text-white/60">
+            Operator-controlled simulation of arrivals, priority scoring, emergency preemption, zone redirects, ageing, and reporting. Real-world stadium event scenario.
+          </p>
         </div>
-        <button type="button" onClick={resetDemo} className="rounded-full border border-white/10 px-4 py-2 text-xs text-white/70 hover:bg-white/10">
-          Reset demo
-        </button>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            disabled={autoRunning}
+            onClick={autoRun}
+            className="rounded-full bg-cyan-300 px-4 py-2 text-xs font-medium text-black hover:bg-cyan-200 disabled:opacity-50"
+          >
+            {autoRunning ? "Running…" : "▶ Auto-run full demo"}
+          </button>
+          <button
+            type="button"
+            onClick={resetDemo}
+            className="rounded-full border border-white/10 px-4 py-2 text-xs text-white/70 hover:bg-white/10"
+          >
+            Reset
+          </button>
+        </div>
       </div>
 
       <div className="mb-5 grid gap-2 sm:grid-cols-2 lg:grid-cols-6">
-        <DemoButton label="General vehicle arrives" onClick={registerGeneral} />
-        <DemoButton label="VVIP arrives" onClick={registerVvip} />
-        <DemoButton label="Ambulance arrives" onClick={registerAmbulance} danger />
-        <DemoButton label="Fill VVIP zone to 86%" onClick={fillVvipZone} />
-        <DemoButton label="Wait 20 minutes" onClick={waitTwentyMinutes} />
-        <DemoButton label="Generate report" onClick={generateReport} />
+        <DemoButton label="General arrives" sub="score 1.0" onClick={registerGeneral} />
+        <DemoButton label="VVIP arrives" sub="score 8.0" onClick={registerVvip} accent />
+        <DemoButton label="🚑 Ambulance arrives" sub="score 20.0" onClick={registerAmbulance} danger />
+        <DemoButton label="Fill VVIP to 90%" sub="trigger redirect" onClick={fillVvipZone} />
+        <DemoButton label="⏱ Wait 20 min" sub="trigger ageing" onClick={waitTwentyMinutes} />
+        <DemoButton label="📊 Generate report" sub="post-event" onClick={generateReport} />
       </div>
 
-      <div className="grid gap-5 xl:grid-cols-[0.9fr_1.1fr_0.9fr]">
-        <Panel title="demo steps">
+      <div className="grid gap-5 xl:grid-cols-[0.9fr_1.2fr_0.9fr]">
+        <Panel title="demo script — 7 steps">
           <ol className="space-y-2 text-sm text-white/70">
             {steps.map((step, index) => (
-              <li key={step} className={activeStep === index + 1 ? "rounded-lg bg-white/10 p-2 text-white" : "p-2"}>
-                Step {index + 1}: {step}
+              <li
+                key={step}
+                className={
+                  activeStep === index + 1
+                    ? "rounded-lg border border-cyan-300/30 bg-cyan-300/10 p-2 text-white"
+                    : activeStep > index + 1
+                    ? "p-2 text-white/40 line-through decoration-emerald-400/40"
+                    : "p-2"
+                }
+              >
+                <span className="mr-2 text-xs text-cyan-200">Step {index + 1}</span>
+                {step}
               </li>
             ))}
           </ol>
         </Panel>
 
-        <Panel title="live queue scoring">
+        <Panel title="live priority queue">
           {demoVehicles.length ? (
             <div className="space-y-2">
               {demoVehicles.map((vehicle, index) => (
-                <div key={vehicle.id} className="grid grid-cols-[auto_1fr_auto] items-center gap-3 rounded-lg bg-white/5 p-3">
+                <div
+                  key={vehicle.id}
+                  className={`grid grid-cols-[auto_1fr_auto] items-center gap-3 rounded-lg p-3 transition-colors ${
+                    vehicle.category === "Emergency"
+                      ? "bg-red-500/10 ring-1 ring-red-400/30"
+                      : vehicle.category === "VVIP"
+                      ? "bg-cyan-400/10 ring-1 ring-cyan-300/20"
+                      : "bg-white/5"
+                  }`}
+                >
                   <span className="text-xs text-white/50">#{index + 1}</span>
                   <div>
-                    <p className="text-sm text-white">{vehicle.plate} - {vehicle.category}</p>
-                    <p className="text-xs text-white/55">{vehicle.zone} - {vehicle.status}{vehicle.wait ? ` - waited ${vehicle.wait} min` : ""}</p>
+                    <p className="text-sm text-white">
+                      {vehicle.plate}
+                      <span className="ml-2 text-[10px] uppercase tracking-wider text-white/50">{vehicle.category}</span>
+                    </p>
+                    <p className="text-[11px] text-white/60">{vehicle.driver} · {vehicle.context}</p>
+                    <p className="text-[11px] text-white/45">
+                      {vehicle.zone} · {vehicle.status} · arrived {vehicle.arrived}
+                      {vehicle.wait ? ` · waited ${vehicle.wait} min` : ""}
+                    </p>
                   </div>
-                  <span className={vehicle.score >= 20 ? "text-lg font-semibold text-red-300" : vehicle.score >= 8 ? "text-lg font-semibold text-cyan-200" : "text-lg font-semibold text-white"}>
-                    {vehicle.score}
-                  </span>
+                  <div className="text-right">
+                    <div
+                      className={
+                        vehicle.score >= 20
+                          ? "text-xl font-semibold text-red-300"
+                          : vehicle.score >= 8
+                          ? "text-xl font-semibold text-cyan-200"
+                          : "text-xl font-semibold text-white"
+                      }
+                    >
+                      {vehicle.score.toFixed(1)}
+                    </div>
+                    <div className="text-[10px] uppercase tracking-wider text-white/40">aps score</div>
+                  </div>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-sm text-white/60">No demo vehicles yet. Start with General vehicle arrives.</p>
+            <p className="text-sm text-white/60">No demo vehicles yet. Click a button above to register an arrival.</p>
           )}
         </Panel>
 
-        <Panel title="zone status and report">
+        <Panel title="zone occupancy & operator log">
           <div className="mb-4 space-y-2">
             {demoZones.map((zone) => {
               const pct = Math.round((zone.occupied / zone.capacity) * 100);
+              const flashing = flashZone === zone.id;
+              const tone =
+                pct >= 86
+                  ? { bar: "bg-amber-300", text: "text-amber-300", label: "high" }
+                  : zone.kind === "emergency" && zone.occupied
+                  ? { bar: "bg-red-300", text: "text-red-300", label: "active" }
+                  : { bar: "bg-emerald-300", text: "text-white/60", label: "ok" };
               return (
-                <div key={zone.id} className="rounded-lg bg-white/5 p-3">
+                <div
+                  key={zone.id}
+                  className={`rounded-lg bg-white/5 p-3 transition-all ${flashing ? "ring-2 ring-cyan-300 bg-cyan-300/10" : ""}`}
+                >
                   <div className="mb-2 flex justify-between text-sm">
                     <span className="text-white">{zone.name}</span>
-                    <span className={pct >= 86 ? "text-amber-300" : zone.kind === "emergency" && zone.occupied ? "text-red-300" : "text-white/60"}>{pct}%</span>
+                    <span className={tone.text}>
+                      {zone.occupied}/{zone.capacity} · {pct}%
+                    </span>
                   </div>
                   <div className="h-1.5 overflow-hidden rounded-full bg-white/10">
-                    <div className={pct >= 86 ? "h-full bg-amber-300" : zone.kind === "emergency" && zone.occupied ? "h-full bg-red-300" : "h-full bg-emerald-300"} style={{ width: `${pct}%` }} />
+                    <div
+                      className={`h-full ${tone.bar} transition-all duration-500`}
+                      style={{ width: `${pct}%` }}
+                    />
                   </div>
                 </div>
               );
@@ -669,13 +830,19 @@ function DemoModePanel() {
           </div>
 
           {reportReady ? (
-            <div className="rounded-lg border border-emerald-300/30 bg-emerald-400/10 p-3 text-sm text-emerald-100">
-              <p>Allocation accuracy: 98%</p>
-              <p>Slot utilisation rate: 71%</p>
-              <p>Avg wait: Emergency 0m, VVIP 2m, General 9m</p>
+            <div className="space-y-1 rounded-lg border border-emerald-300/30 bg-emerald-400/10 p-3 text-sm text-emerald-100">
+              <p className="mb-2 text-xs uppercase tracking-wider text-emerald-200">post-event report</p>
+              <p>Allocation accuracy: <span className="font-semibold text-white">98.2%</span></p>
+              <p>Slot utilisation rate: <span className="font-semibold text-white">71%</span></p>
+              <p>Emergency response: <span className="font-semibold text-white">avg 1.4 s</span></p>
+              <p>Avg wait — Emergency: 0 min · VVIP: 2 min · General: 9 min</p>
+              <p>Total allocations: <span className="font-semibold text-white">{demoVehicles.length}</span> · Manual overrides: 0</p>
             </div>
           ) : (
-            <SimpleRows rows={log} />
+            <div>
+              <p className="mb-2 text-[10px] uppercase tracking-wider text-white/40">operator log</p>
+              <SimpleRows rows={log} />
+            </div>
           )}
         </Panel>
       </div>
@@ -683,14 +850,32 @@ function DemoModePanel() {
   );
 }
 
-function DemoButton({ label, onClick, danger = false }: { label: string; onClick: () => void; danger?: boolean }) {
+function DemoButton({
+  label,
+  sub,
+  onClick,
+  danger = false,
+  accent = false,
+}: {
+  label: string;
+  sub?: string;
+  onClick: () => void;
+  danger?: boolean;
+  accent?: boolean;
+}) {
+  const cls = danger
+    ? "bg-red-400 text-black hover:bg-red-300"
+    : accent
+    ? "bg-cyan-300 text-black hover:bg-cyan-200"
+    : "bg-white text-black hover:bg-neutral-200";
   return (
     <button
       type="button"
       onClick={onClick}
-      className={danger ? "rounded-xl bg-red-400 px-3 py-3 text-sm text-black hover:bg-red-300" : "rounded-xl bg-white px-3 py-3 text-sm text-black hover:bg-neutral-200"}
+      className={`flex flex-col items-start rounded-xl px-3 py-2.5 text-left text-sm transition-colors ${cls}`}
     >
-      {label}
+      <span className="font-medium leading-tight">{label}</span>
+      {sub ? <span className="text-[10px] opacity-70">{sub}</span> : null}
     </button>
   );
 }
