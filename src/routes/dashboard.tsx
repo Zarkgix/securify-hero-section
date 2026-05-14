@@ -85,6 +85,9 @@ type DemoVehicle = {
   zone: string;
   status: string;
   wait: number;
+  driver: string;
+  context: string;
+  arrived: string;
 };
 
 type DemoZone = {
