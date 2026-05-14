@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { PageShell } from "@/components/layout/PageShell";
+import { apiUrl } from "@/lib/api";
 
 export const Route = createFileRoute("/ai-support")({
-  head: () => ({ meta: [{ title: "ai support — stadie-park" }] }),
+  head: () => ({ meta: [{ title: "ai support - stadie-park" }] }),
   component: AiSupportPage,
 });
 
@@ -11,22 +12,63 @@ type Msg = { role: "user" | "assistant"; text: string };
 
 function AiSupportPage() {
   const [messages, setMessages] = useState<Msg[]>([
-    { role: "assistant", text: "hi, i'm your local stadie-park assistant. ask me about queue priorities, payments, or parking." },
+    {
+      role: "assistant",
+      text: "Hi, I am your local Stadie-Park assistant. Ask me about queue priorities, payments, parking, or what your account can do.",
+    },
   ]);
   const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const send = () => {
-    if (!input.trim()) return;
-    setMessages((m) => [
-      ...m,
-      { role: "user", text: input },
-      { role: "assistant", text: "(local llm not yet wired — backend will plug in here)" },
-    ]);
+  const send = async () => {
+    const text = input.trim();
+    if (!text || loading) return;
+
+    setMessages((m) => [...m, { role: "user", text }]);
     setInput("");
+
+    const token = localStorage.getItem("stadie_park_token");
+    if (!token) {
+      setMessages((m) => [
+        ...m,
+        { role: "assistant", text: "Please log in first so I can answer using your Stadie-Park role and account data." },
+      ]);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch(apiUrl("/ai/chat"), {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message: text }),
+      });
+
+      if (!response.ok) {
+        setMessages((m) => [
+          ...m,
+          { role: "assistant", text: "Please log in again before using AI support." },
+        ]);
+        return;
+      }
+
+      const data = await response.json();
+      setMessages((m) => [...m, { role: "assistant", text: data.reply }]);
+    } catch {
+      setMessages((m) => [
+        ...m,
+        { role: "assistant", text: "I cannot reach the assistant service right now. Make sure the backend and Ollama are running." },
+      ]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <PageShell title="ai support" description="local llm assistant — privacy-first explanations">
+    <PageShell title="ai support" description="local llm assistant - privacy-first explanations">
       <div className="bg-neutral-900/90 backdrop-blur rounded-3xl border border-white/10 flex flex-col h-[60vh]">
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
           {messages.map((m, i) => (
@@ -42,6 +84,7 @@ function AiSupportPage() {
               </div>
             </div>
           ))}
+          {loading ? <p className="text-xs text-white/50">Assistant is thinking...</p> : null}
         </div>
         <div className="border-t border-white/10 p-4 flex gap-2">
           <input
@@ -53,9 +96,10 @@ function AiSupportPage() {
           />
           <button
             onClick={send}
-            className="bg-white text-black text-sm rounded-full px-6 py-3 hover:bg-neutral-200 transition-colors"
+            disabled={loading}
+            className="bg-white text-black text-sm rounded-full px-6 py-3 hover:bg-neutral-200 transition-colors disabled:opacity-50"
           >
-            send
+            {loading ? "thinking..." : "send"}
           </button>
         </div>
       </div>

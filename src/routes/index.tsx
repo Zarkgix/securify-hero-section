@@ -1,6 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
-import { Logo } from "@/components/brand/Logo";
+import { createFileRoute } from "@tanstack/react-router";
+import { AppNavbar } from "@/components/layout/AppNavbar";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -14,16 +13,7 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-const navLinks = [
-  { to: "/login", label: "log in" },
-  { to: "/ai-support", label: "ai support" },
-  { to: "/about", label: "about" },
-  { to: "/dashboard", label: "dashboard" },
-] as const;
-
 function Index() {
-  const [open, setOpen] = useState(false);
-
   return (
     <section className="relative min-h-screen w-full overflow-hidden bg-black">
       <video
@@ -35,67 +25,7 @@ function Index() {
         src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260418_063509_7d167302-4fd4-480b-8260-18ab572333d4.mp4"
       />
       <div className="absolute inset-0 bg-black/30" />
-
-      <nav className="absolute top-0 left-0 right-0 z-20 px-4 md:px-10 pt-6 flex items-center justify-between gap-3">
-        <Link to="/" className="flex items-center gap-2 bg-white/10 backdrop-blur rounded-full pl-4 pr-5 py-3 border border-white/10">
-          <Logo />
-          <span className="text-white text-sm font-normal tracking-tight">stadie-park</span>
-        </Link>
-
-        <div className="hidden md:flex items-center gap-1 bg-white/10 backdrop-blur rounded-full px-3 py-2 border border-white/10">
-          {navLinks.map((l) => (
-            <Link
-              key={l.to}
-              to={l.to}
-              className="text-neutral-200 hover:text-white transition-colors text-sm px-4 py-2 rounded-full"
-            >
-              {l.label}
-            </Link>
-          ))}
-        </div>
-
-        <Link
-          to="/login"
-          className="hidden md:inline-block bg-white text-black text-sm font-normal rounded-full px-6 py-3 hover:bg-neutral-200 transition-colors"
-        >
-          get started
-        </Link>
-
-        <button
-          type="button"
-          aria-label="toggle menu"
-          onClick={() => setOpen((o) => !o)}
-          className="md:hidden bg-white/10 backdrop-blur border border-white/10 rounded-full h-11 w-11 flex items-center justify-center text-white"
-        >
-          <div className="flex flex-col gap-1">
-            <span className="block h-px w-5 bg-white" />
-            <span className="block h-px w-5 bg-white" />
-            <span className="block h-px w-5 bg-white" />
-          </div>
-        </button>
-
-        {open && (
-          <div className="md:hidden absolute top-full mt-3 right-4 left-4 bg-neutral-900/95 backdrop-blur rounded-3xl border border-white/10 p-4 flex flex-col gap-1 z-30">
-            {navLinks.map((l) => (
-              <Link
-                key={l.to}
-                to={l.to}
-                onClick={() => setOpen(false)}
-                className="text-neutral-200 hover:text-white text-sm px-4 py-3 rounded-2xl hover:bg-white/5"
-              >
-                {l.label}
-              </Link>
-            ))}
-            <Link
-              to="/login"
-              onClick={() => setOpen(false)}
-              className="mt-2 bg-white text-black text-sm rounded-full px-6 py-3 text-center"
-            >
-              get started
-            </Link>
-          </div>
-        )}
-      </nav>
+      <AppNavbar />
 
       <div className="relative h-screen w-full">
         <h1 className="hero-title absolute text-white font-medium text-[18vw] md:text-[13vw] left-4 md:left-10 top-[20%] md:top-[18%]">park</h1>
