@@ -7,6 +7,7 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
+import { FloatingChatbot } from "@/components/assistant/FloatingChatbot";
 
 import appCss from "../styles.css?url";
 
@@ -114,6 +115,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <Outlet />
+      <FloatingChatbot />
     </QueryClientProvider>
   );
 }
